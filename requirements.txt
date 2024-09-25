@@ -1,4 +1,4 @@
-python-telgram-bot
+python-telegram-bot
 asyncpg
 datetime
 logging
