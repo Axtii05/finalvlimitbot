@@ -1,0 +1,5 @@
+python-telgram-bot
+asyncpg
+datetime
+logging
+nanoid
