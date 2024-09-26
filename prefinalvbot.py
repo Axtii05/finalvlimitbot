@@ -71,25 +71,25 @@ def get_period_range(date_period):
 warehouses_data = [
     (1, "Подольск 3", 29.8, 59.6, 59.6),
     (2, "Коледино", 29.27, 59.4, 59.4),
-    (3, "Подольск", 29.27, 66, "н/др"),
+    (3, "Подольск", 29.27, 66, "н/д"),
     (4, "Электросталь", 11.2, 47.85, 47.85),
     (5, "Алексин (Тула)", 7.13, 47.85, 66),
-    (6, "Обухово 2", 28, "н/др", 56.1),
+    (6, "Обухово 2", 28, "н/д", 56.1),
     (7, "Белая Дача", 1.77, 64.35, 41.25),
-    (8, "Белые Столбы", 7.01, 92.4, "н/др"),
+    (8, "Белые Столбы", 7.01, 92.4, "н/д"),
     (9, "Казань", 12.91, 64.35, 82.5),
-    (10, "Вёшки", 1.72, "н/др", 66),
+    (10, "Вёшки", 1.72, "н/д", 66),
     (11, "Рязань (Тюшевское)", 12.34, 46.2, 41.25),
-    (12, "Котовск", 2.95, "н/др", 57.75),
+    (12, "Котовск", 2.95, "н/д", 57.75),
     (13, "Краснодар", 4.92, 54.45, 51.15),
     (14, "Чехов 2", 2.39, 56.1, 64.35),
-    (15, "Уткина Заводь", 6.72, 70.95, "н/др"),
+    (15, "Уткина Заводь", 6.72, 70.95, "н/д"),
     (16, "Невинномысск", 13.84, 49.5, 57.75),
-    (17, "Кузнецк", 1.12, "н/др", 47.85),
-    (18, "Новосибирск", 10.53, 141.9, "н/др"),
-    (19, "Испытателей", 6.58, 66, "н/др"),
+    (17, "Кузнецк", 1.12, "н/д", 47.85),
+    (18, "Новосибирск", 10.53, 141.9, "н/д"),
+    (19, "Испытателей", 6.58, 66, "н/д"),
     (20, "Хабаровск", 0.8, 72.6, 33),
-    (21, "Минск", 1.45, "н/др", 69.3),
+    (21, "Минск", 1.45, "н/д", 69.3),
     (22, "Алматы Атакент", 1.85, 41.25, 18.15)
 ]
 
@@ -148,7 +148,7 @@ async def start(update: Update, context: CallbackContext):
         await update.message.reply_text(
             "Привет! Я бот для работы со складами Wildberries. Вот что я умею:\n\n"
             "1. Подбор складов\n"
-            "2. Топ складов по регионам\n" 
+            "2. Топ складов по округам\n" 
             "3. Поиск лимитов на складе\n\n"
             "Выберите действие:",
             reply_markup=reply_markup
@@ -157,7 +157,7 @@ async def start(update: Update, context: CallbackContext):
         await update.callback_query.message.reply_text(
             "Выберите действие:\n\n"
             "1. Подбор складов\n"
-            "2. Топ складов по регионам\n"
+            "2. Топ складов по округам\n"
             "3. Поиск лимитов на складе\n\n",
             reply_markup=reply_markup
         )
@@ -292,7 +292,7 @@ async def update_region_message(update: Update, context: CallbackContext):
     selected_region = context.user_data.get('selected_region', "Центральный")  
     warehouses = get_warehouses_by_region(selected_region) 
 
-    message = f"Склады региона {selected_region}:\n"
+    message = f"Склады округа {selected_region}:\n"
     for warehouse in warehouses:
         message += f"{warehouse[1]} - {warehouse[2]}% / {warehouse[3]}р / {warehouse[4]}р\n"
 
@@ -467,8 +467,6 @@ async def edit_existing_request(update: Update, context: CallbackContext):
             await connection.close()
     # TODO: Получить данные запроса из базы данных по request_id
     request_data = await get_request_from_db(connection, request_id)
-
-    context.user_data['request'] = requests[request_id]  # Пока используем данные из requests
     await select_warehouse_for_limits(update, context)  # Начинаем с выбора складов (можно изменить на другую функцию)
 
 async def select_warehouse_for_limits(update: Update, context: CallbackContext):
