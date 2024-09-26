@@ -129,7 +129,7 @@ def translate_to_russian(key, value):
 requests = {}  
 
 def generate_request_id():
-    return str (generate('0123456789', 4))
+    return str (generate('123456789', 4))
 
 def get_warehouses_by_region(region):
     warehouse_ids = regions_data.get(region, [])
@@ -659,7 +659,7 @@ async def confirm_request(update: Update, context: CallbackContext):
             ]
             reply_markup = InlineKeyboardMarkup(keyboardline)
 
-            await update.callback_query.edit_message_text(message)
+            await update.callback_query.edit_message_text(message, reply_markup=reply_markup)
             await save_request(
                 connection,
                 int(request_id),
@@ -671,7 +671,6 @@ async def confirm_request(update: Update, context: CallbackContext):
                 None,
             )
 
-            
             await connection.close()
             return
 
