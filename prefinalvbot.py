@@ -17,7 +17,7 @@ async def init_db():
         database='postgres', 
         host='aws-0-eu-central-1.pooler.supabase.com',
         port = '6543',
-        statement_cache_size=0
+        statement_cache_size=0,
     )
 
 
@@ -498,7 +498,12 @@ async def select_warehouse_for_limits(update: Update, context: CallbackContext):
 async def warehouse_selected(update: Update, context: CallbackContext):
     query = update.callback_query
     warehouse_name = query.data.split('_')[-1]
-    selected_warehouses = context.user_data.get('request', {}).get('warehouses', {})
+
+    if 'request' not in context.user_data:
+        await query.answer("Ошибка: данные заявки отсутствуют.")
+        return
+
+    selected_warehouses = context.user_data['request'].get('warehouses', {})
 
     if warehouse_name in selected_warehouses:
         del selected_warehouses[warehouse_name]
@@ -508,7 +513,6 @@ async def warehouse_selected(update: Update, context: CallbackContext):
     context.user_data['request']['warehouses'] = selected_warehouses
 
     await select_warehouse_for_limits(update, context)
-
 
 async def next_step(update: Update, context: CallbackContext):
     await select_delivery_type(update, context)
@@ -678,7 +682,6 @@ async def confirm_request(update: Update, context: CallbackContext):
         # Проверяем, что список складов не пустой 
         if not warehouse_ids:
             await update.callback_query.edit_message_text("Ошибка: список складов пуст.")
-            await connection.close()
             return
 
         # Получаем названия складов по их ID
@@ -687,7 +690,6 @@ async def confirm_request(update: Update, context: CallbackContext):
         # Дополнительная проверка на наличие складов в warehouses_data
         if not warehouse_names:
             await update.callback_query.edit_message_text("Ошибка: выбранные склады не найдены в базе данных.")
-            await connection.close()
             return
 
         warehouses = ', '.join(warehouse_names)
